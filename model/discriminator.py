@@ -4,37 +4,43 @@ import torch.nn.functional as F
 
 
 class Discriminator(nn.Module):
-    def __init__(self):
+    def __init__(self, ndf, n_layers, downsampling_factor, disc_out = 512):
         super(Discriminator, self).__init__()
+        discriminator = nn.ModuleDict()
+        discriminator["layer_0"] = nn.Sequential(
+            nn.ReflectionPad1d(7),
+            nn.utils.weight_norm(nn.Conv1d(1, ndf, kernel_size=15, stride=1)),
+            nn.LeakyReLU(0.2, True),
+        )
 
-        self.discriminator = nn.ModuleList([
-            nn.Sequential(
-                nn.ReflectionPad1d(7),
-                nn.utils.weight_norm(nn.Conv1d(1, 16, kernel_size=15, stride=1)),
-                nn.LeakyReLU(0.2, inplace=True),
-            ),
-            nn.Sequential(
-                nn.utils.weight_norm(nn.Conv1d(16, 64, kernel_size=41, stride=4, padding=20, groups=4)),
-                nn.LeakyReLU(0.2, inplace=True),
-            ),
-            nn.Sequential(
-                nn.utils.weight_norm(nn.Conv1d(64, 256, kernel_size=41, stride=4, padding=20, groups=16)),
-                nn.LeakyReLU(0.2, inplace=True),
-            ),
-            nn.Sequential(
-                nn.utils.weight_norm(nn.Conv1d(256, 1024, kernel_size=41, stride=4, padding=20, groups=64)),
-                nn.LeakyReLU(0.2, inplace=True),
-            ),
-            nn.Sequential(
-                nn.utils.weight_norm(nn.Conv1d(1024, 1024, kernel_size=41, stride=4, padding=20, groups=256)),
-                nn.LeakyReLU(0.2, inplace=True),
-            ),
-            nn.Sequential(
-                nn.utils.weight_norm(nn.Conv1d(1024, 1024, kernel_size=5, stride=1, padding=2)),
-                nn.LeakyReLU(0.2, inplace=True),
-            ),
-            nn.utils.weight_norm(nn.Conv1d(1024, 1, kernel_size=3, stride=1, padding=1)),
-        ])
+        nf = ndf
+        stride = downsampling_factor
+        for n in range(1, n_layers + 1):
+            nf_prev = nf
+            nf = min(nf * stride, disc_out)
+
+            discriminator["layer_%d" % n] = nn.Sequential(
+                nn.utils.weight_norm(nn.Conv1d(
+                    nf_prev,
+                    nf,
+                    kernel_size=stride * 10 + 1,
+                    stride=stride
+                    padding=stride * 5,
+                    groups=nf_prev // 4,
+                )),
+                nn.LeakyReLU(0.2, True),
+            )
+
+        nf = min(nf * 2, disc_out)
+        discriminator["layer_%d" % (n_layers + 1)] = nn.Sequential(
+            nn.utils.weight_norm(nn.Conv1d((nf_prev, nf, kernel_size=5, stride=1, padding=2)),
+            nn.LeakyReLU(0.2, True),
+        )
+
+        discriminator["layer_%d" % (n_layers + 2)] = nn.utils.weight_norm(nn.Conv1d(
+            nf, 1, kernel_size=3, stride=1, padding=1
+        ))
+        self.discriminator = discriminator
 
     def forward(self, x):
         '''
@@ -43,10 +49,10 @@ class Discriminator(nn.Module):
             since we're using Least Squares GAN (https://arxiv.org/abs/1611.04076)
         '''
         features = list()
-        for module in self.discriminator:
+        for key, module in self.discriminator.items():
             x = module(x)
             features.append(x)
-        return features[:-1], features[-1]
+        return featuress[:-1], features[-1]
 
 
 if __name__ == '__main__':
