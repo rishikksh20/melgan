@@ -1,1 +1,1 @@
-# Tacotron_MelGAN_TTS
+# Multi Band MelGAN
