@@ -7,15 +7,15 @@ from .identity import Identity
 
 
 class MultiScaleDiscriminator(nn.Module):
-    def __init__(self, num_D, ndf, n_layers, downsampling_factor):
+    def __init__(self, num_D, ndf, n_layers, downsampling_factor, disc_out):
         super().__init__()
         self.model = nn.ModuleDict()
         for i in range(num_D):
             self.model[f"disc_{i}"] = Discriminator(
-                ndf, n_layers, downsampling_factor
+                ndf, n_layers, downsampling_factor, disc_out
             )
 
-        self.downsample = nn.AvgPool1d(4, stride=2, padding=1, count_include_pad=False)
+        self.downsample = nn.AvgPool1d(downsampling_factor, stride=2, padding=1, count_include_pad=False)
         self.apply(weights_init)
 
     def forward(self, x):

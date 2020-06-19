@@ -24,7 +24,7 @@ class Discriminator(nn.Module):
                     nf_prev,
                     nf,
                     kernel_size=stride * 10 + 1,
-                    stride=stride
+                    stride=stride,
                     padding=stride * 5,
                     groups=nf_prev // 4,
                 )),
@@ -33,7 +33,7 @@ class Discriminator(nn.Module):
 
         nf = min(nf * 2, disc_out)
         discriminator["layer_%d" % (n_layers + 1)] = nn.Sequential(
-            nn.utils.weight_norm(nn.Conv1d((nf_prev, nf, kernel_size=5, stride=1, padding=2)),
+            nn.utils.weight_norm(nn.Conv1d(nf_prev, nf, kernel_size=5, stride=1, padding=2)),
             nn.LeakyReLU(0.2, True),
         )
 

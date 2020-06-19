@@ -4,6 +4,7 @@ data: # root path of train/validation data (either relative/absoulte path is ok)
 ---
 train:
   rep_discriminator: 1
+  discriminator_train_start_steps: 200000
   num_workers: 32
   batch_size: 16
   optimizer: 'adam'
@@ -25,6 +26,18 @@ audio:
 ---
 model:
   feat_match: 10.0
+  lambda_adv: 4
+  use_subband_stft_loss: True
+  feat_loss: False
+  out_channel: 1
+  generator_ratio: [8, 5, 5]
+  mult: 256
+  n_residual_layers: 4
+  num_D : 3
+  ndf : 16
+  n_layers: 3
+  downsampling_factor: 4
+  disc_out: 512
 ---
 log:
   summary_interval: 1

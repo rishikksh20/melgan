@@ -2,8 +2,6 @@ import os
 import math
 import tqdm
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 import itertools
 import traceback
 from utils.pqmf import PQMF
@@ -11,12 +9,16 @@ from model.generator import Generator
 from model.multiscale import MultiScaleDiscriminator
 from .utils import get_commit_hash
 from .validation import validate
-from utils.stft import MultiResolutionSTFTLoss
+from utils.stft_loss import MultiResolutionSTFTLoss
 
 
 def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, hp_str):
-    model_g = Generator(hp.audio.n_mel_channels, 4).cuda()
-    model_d = MultiScaleDiscriminator().cuda()
+    model_g = Generator(hp.audio.n_mel_channels, hp.model.n_residual_layers,
+                        ratios=hp.model.generator_ratio, mult = hp.model.mult,
+                        out_band = hp.model.out_channels).cuda()
+
+    model_d = MultiScaleDiscriminator(hp.model.num_D, hp.model.ndf, hp.model.n_layers,
+                                      hp.model.downsampling_factor, hp.model.disc_out).cuda()
 
     optim_g = torch.optim.Adam(model_g.parameters(),
         lr=hp.train.adam.lr, betas=(hp.train.adam.beta1, hp.train.adam.beta2))
@@ -76,17 +78,15 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
                 loss_g = 0.0
                 pqmf = PQMF()
                 # reconstruct the signal from multi-band signal
-                if hp.out_channels > 1:
+                if hp.model.out_channels > 1:
                     y_mb_ = fake_audio
                     fake_audio = pqmf.synthesis(y_mb_)
 
                 stft_loss = MultiResolutionSTFTLoss()
-                sc_loss, mag_loss = stft_loss(y_.squeeze(1), y.squeeze(1))
-                loss_g_spectral += sc_loss.item()
-                loss_g_logstft += mag_loss.item()
+                sc_loss, mag_loss = stft_loss(fake_audio.squeeze(1), audioG.squeeze(1))
                 loss_g = sc_loss + mag_loss
 
-                if hp.use_subband_stft_loss:
+                if hp.model.use_subband_stft_loss:
                     
                     loss_g *= 0.5  # for balancing with subband stft loss
                     y_mb = pqmf.analysis(audioG)
@@ -95,7 +95,7 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
                     sub_sc_loss, sub_mag_loss = stft_loss(y_mb_, y_mb)
                     loss_g += 0.5 * (sub_sc_loss + sub_mag_loss)
 
-                if steps > hp.discriminator_train_start_steps:
+                if step > hp.train.discriminator_train_start_steps:
                     disc_real = model_d(audioG)
                     disc_fake = model_d(fake_audio)
                     # for multi-scale discriminator
@@ -104,12 +104,12 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
                         adv_loss += torch.mean(torch.sum(torch.pow(score_fake - 1.0, 2), dim=[1, 2]))
 
 
-                    if hp.feat_loss :
+                    if hp.model.feat_loss :
                         for (feats_fake, score_fake), (feats_real, _) in zip(disc_fake, disc_real):
                             for feat_f, feat_r in zip(feats_fake, feats_real):
                                 adv_loss += hp.model.feat_match * torch.mean(torch.abs(feat_f - feat_r))
 
-                    loss_g += hp.lambda_adv * adv_loss
+                    loss_g += hp.model.lambda_adv * adv_loss
             
 
                 loss_g.backward()
