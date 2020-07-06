@@ -1,6 +1,6 @@
-# MelGAN, Multi-Band MelGAN and Full Band MelGAN
-Unofficial PyTorch implementation of [Multi-Band MelGAN](https://arxiv.org/abs/2005.05106). This implementation uses [Seungwon Park's](http://swpark.me) MelGAN repo as a base and PQMF filters
-implementation of this [repo](https://github.com/kan-bayashi/ParallelWaveGAN). 
+# MelGAN, Multi-band MelGAN and Full band MelGAN [WIP]
+Unofficial PyTorch implementation of [Multi-Band MelGAN paper](https://arxiv.org/abs/2005.05106). This implementation uses [Seungwon Park's](http://swpark.me) MelGAN repo as a base and PQMF filters
+implementation from this [repo](https://github.com/kan-bayashi/ParallelWaveGAN). 
 <br>**MelGAN :**
 ![](./assets/gd.png)
 <br>
@@ -29,14 +29,14 @@ pip install -r requirements.txt
 - `tensorboard --logdir logs/`
 
 ## Pretrained model
-soon
+WIP
 
 ## Inference
 
 - `python inference.py -p [checkpoint path] -i [input mel path]`
 
 ## Results
-soon
+WIP
 
 ## References
 - [Multi-band MelGAN](https://arxiv.org/abs/2005.05106)
