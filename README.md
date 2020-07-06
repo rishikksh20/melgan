@@ -1,14 +1,11 @@
 # MelGAN, Multi-Band MelGAN and Full Band MelGAN
-Unofficial PyTorch implementation of [MelGAN vocoder](https://arxiv.org/abs/1910.06711)
-
-## Key Features
-
-- MelGAN is lighter, faster, and better at generalizing to unseen speakers than [WaveGlow](https://github.com/NVIDIA/waveglow).
-- This repository use identical mel-spectrogram function from [NVIDIA/tacotron2](https://github.com/NVIDIA/tacotron2), so this can be directly used to convert output from NVIDIA's tacotron2 into raw-audio.
-- Pretrained model on LJSpeech-1.1 via [PyTorch Hub](https://pytorch.org/hub).
-
+Unofficial PyTorch implementation of [Multi-Band MelGAN](https://arxiv.org/abs/2005.05106). This implementation uses [Seungwon Park's](http://swpark.me) MelGAN repo as a base and PQMF filters
+implementation of this [repo](https://github.com/kan-bayashi/ParallelWaveGAN). 
+<br>**MelGAN :**
 ![](./assets/gd.png)
-
+<br>
+**Multi-band MelGAN:**<br>
+![](./assets/multiband_melgan.png)
 ## Prerequisites
 
 Tested on Python 3.6
@@ -32,23 +29,25 @@ pip install -r requirements.txt
 - `tensorboard --logdir logs/`
 
 ## Pretrained model
-
-
+soon
 
 ## Inference
 
 - `python inference.py -p [checkpoint path] -i [input mel path]`
 
 ## Results
+soon
+
+## References
+- [Multi-band MelGAN](https://arxiv.org/abs/2005.05106)
+- [MelGAN](https://arxiv.org/abs/1910.06711)
+- [Pytorch implementation of melgan](https://github.com/seungwonpark/melgan)
+- [Official implementation of melgan](https://github.com/descriptinc/melgan-neurips)
+- [Multi, Full-band melgan implementation](https://github.com/kan-bayashi/ParallelWaveGAN)
+- [Nvidia's pre-processing](https://github.com/NVIDIA/tacotron2)
+- [WaveRNN](https://github.com/fatchord/WaveRNN)
 
 
-
-
-## Implementation Authors
-
-- [Seungwon Park](http://swpark.me) @ MINDsLab Inc. (yyyyy@snu.ac.kr, swpark@mindslab.ai)
-- Myunchul Joe @ MINDsLab Inc.
-- [Rishikesh](https://github.com/rishikksh20) @ DeepSync Technologies Pvt Ltd.
 
 ## License
 
