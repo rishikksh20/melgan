@@ -4,7 +4,7 @@ import tqdm
 import torch
 import argparse
 from scipy.io.wavfile import write
-
+import numpy as np
 from model.generator import Generator
 from utils.hparams import HParam, load_hparam_str
 
@@ -18,22 +18,23 @@ def main(args):
     else:
         hp = load_hparam_str(checkpoint['hp_str'])
 
-    model = Generator(hp.audio.n_mel_channels).cuda()
+    model = Generator(hp.audio.n_mel_channels, hp.model.n_residual_layers,
+                        ratios=hp.model.generator_ratio, mult = hp.model.mult,
+                        out_band = hp.model.out_channels).cuda()
     model.load_state_dict(checkpoint['model_g'])
     model.eval(inference=False)
 
     with torch.no_grad():
-        for melpath in tqdm.tqdm(glob.glob(os.path.join(args.input_folder, '*.mel'))):
-            mel = torch.load(melpath)
-            if len(mel.shape) == 2:
-                mel = mel.unsqueeze(0)
-            mel = mel.cuda()
+        mel = torch.from_numpy(np.load(args.input))
+        if len(mel.shape) == 2:
+            mel = mel.unsqueeze(0)
+        mel = mel.cuda()
 
-            audio = model.inference(mel)
-            audio = audio.cpu().detach().numpy()
+        audio = model.inference(mel)
+        audio = audio.cpu().detach().numpy()
 
-            out_path = melpath.replace('.mel', '_reconstructed_epoch%04d.wav' % checkpoint['epoch'])
-            write(out_path, hp.audio.sampling_rate, audio)
+        out_path = args.input.replace('.npy', '_reconstructed_epoch%04d.wav' % checkpoint['epoch'])
+        write(out_path, hp.audio.sampling_rate, audio)
 
 
 if __name__ == '__main__':
@@ -42,7 +43,7 @@ if __name__ == '__main__':
                         help="yaml file for config. will use hp_str from checkpoint if not given.")
     parser.add_argument('-p', '--checkpoint_path', type=str, required=True,
                         help="path of checkpoint pt file for evaluation")
-    parser.add_argument('-i', '--input_folder', type=str, required=True,
+    parser.add_argument('-i', '--input', type=str, required=True,
                         help="directory of mel-spectrograms to invert into raw audio. ")
     args = parser.parse_args()
 
