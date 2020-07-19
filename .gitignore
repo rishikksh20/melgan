@@ -117,3 +117,4 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+/LJSpeech-1.1
