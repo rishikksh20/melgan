@@ -13,10 +13,10 @@ def create_dataloader(hp, args, train):
 
     if train:
         return DataLoader(dataset=dataset, batch_size=hp.train.batch_size, shuffle=True,
-            num_workers=hp.train.num_workers, pin_memory=True, drop_last=True)
+            num_workers=0, pin_memory=True, drop_last=True)
     else:
         return DataLoader(dataset=dataset, batch_size=1, shuffle=False,
-            num_workers=hp.train.num_workers, pin_memory=True, drop_last=False)
+            num_workers=0, pin_memory=False, drop_last=False)
 
 
 class MelFromDisk(Dataset):
@@ -26,6 +26,9 @@ class MelFromDisk(Dataset):
         self.train = train
         self.path = hp.data.train if train else hp.data.validation
         self.wav_list = glob.glob(os.path.join(self.path, '**', '*.wav'), recursive=True)
+        #print("Wavs path :", self.path)
+        #print(self.hp.data.mel_path)
+        #print("Length of wavelist :", len(self.wav_list))
         self.mel_segment_length = hp.audio.segment_length // hp.audio.hop_length + 2
         self.mapping = [i for i in range(len(self.wav_list))]
 
@@ -33,6 +36,7 @@ class MelFromDisk(Dataset):
         return len(self.wav_list)
 
     def __getitem__(self, idx):
+
         if self.train:
             idx1 = idx
             idx2 = self.mapping[idx1]
@@ -45,14 +49,18 @@ class MelFromDisk(Dataset):
 
     def my_getitem(self, idx):
         wavpath = self.wav_list[idx]
-        melpath = wavpath.replace('.wav', '.mel')
+        id = os.path.basename(wavpath).split(".")[0]
+
+        mel_path = "{}/{}.npy".format(self.hp.data.mel_path, id)
         sr, audio = read_wav_np(wavpath)
         if len(audio) < self.hp.audio.segment_length + self.hp.audio.pad_short:
             audio = np.pad(audio, (0, self.hp.audio.segment_length + self.hp.audio.pad_short - len(audio)), \
                     mode='constant', constant_values=0.0)
 
         audio = torch.from_numpy(audio).unsqueeze(0)
-        mel = torch.load(melpath).squeeze(0)
+        # mel = torch.load(melpath).squeeze(0) # # [num_mel, T]
+
+        mel = torch.from_numpy(np.load(mel_path))
 
         if self.train:
             max_mel_start = mel.size(1) - self.mel_segment_length

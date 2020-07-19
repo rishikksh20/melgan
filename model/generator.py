@@ -39,7 +39,7 @@ class Generator(nn.Module):
             nn.Tanh(),
         ]
 
-        self.generator = nn.Sequential(*model)
+        self.generator = nn.Sequential(*generator)
         self.apply(weights_init)
 
     def forward(self, mel):
@@ -85,14 +85,19 @@ class Generator(nn.Module):
     from res_stack import ResStack
 '''
 if __name__ == '__main__':
+    '''
+    torch.Size([3, 80, 10])
+    torch.Size([3, 1, 2000])
+    4527362
+    '''
     model = Generator(80, 4)
 
-    x = torch.randn(3, 80, 10)
+    x = torch.randn(3, 80, 10)  # (B, channels, T).
     print(x.shape)
 
-    y = model(x)
+    y = model(x) # (B, 1, T ** prod(upsample_scales)
     print(y.shape)
-    assert y.shape == torch.Size([3, 1, 2560])
+    assert y.shape == torch.Size([3, 1, 2560])  # For normal melgan torch.Size([3, 1, 2560])
 
     pytorch_total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(pytorch_total_params)
