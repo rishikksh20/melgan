@@ -7,6 +7,7 @@ from scipy.io.wavfile import write
 import numpy as np
 from model.generator import Generator
 from utils.hparams import HParam, load_hparam_str
+from utils.pqmf import PQMF
 
 MAX_WAV_VALUE = 32768.0
 
@@ -29,9 +30,11 @@ def main(args):
         if len(mel.shape) == 2:
             mel = mel.unsqueeze(0)
         mel = mel.cuda()
-
-        audio = model.inference(mel)
-        audio = audio.cpu().detach().numpy()
+        if hp.model.out_channels == 1:
+            audio = model.inference(mel).cpu().detach().numpy()
+        else:
+            pqmf = PQMF()
+            audio = pqmf.synthesis(model.inference(mel)).view(-1).cpu().detach().numpy()
 
         out_path = args.input.replace('.npy', '_reconstructed_epoch%04d.wav' % checkpoint['epoch'])
         write(out_path, hp.audio.sampling_rate, audio)
