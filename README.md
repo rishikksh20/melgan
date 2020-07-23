@@ -1,4 +1,4 @@
-# MelGAN, Multi-band MelGAN and Full band MelGAN [WIP]
+# Multi-band MelGAN and Full band MelGAN
 Unofficial PyTorch implementation of [Multi-Band MelGAN paper](https://arxiv.org/abs/2005.05106). This implementation uses [Seungwon Park's](http://swpark.me) MelGAN repo as a base and PQMF filters
 implementation from this [repo](https://github.com/kan-bayashi/ParallelWaveGAN). 
 <br>**MelGAN :**
@@ -26,6 +26,7 @@ pip install -r requirements.txt
   - Write down the root path of train/validation files to 2nd/3rd line.
   - Each path should contain pairs of `*.wav` with corresponding (preprocessed) `*.mel` file.
   - The data loader parses list of files within the path recursively.
+  - For **Multi-Band** training use `config/mb_melgan` config file in `-c`
 - `tensorboard --logdir logs/`
 
 ## Pretrained model
