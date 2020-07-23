@@ -62,6 +62,7 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
         stft_loss = MultiResolutionSTFTLoss()
         criterion = torch.nn.MSELoss().cuda()
         pqmf = PQMF()
+
         for epoch in itertools.count(init_epoch+1):
             if epoch % hp.log.validation_interval == 0:
                 with torch.no_grad():
@@ -69,7 +70,9 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
 
             trainloader.dataset.shuffle_mapping()
             loader = tqdm.tqdm(trainloader, desc='Loading train data')
-
+            avg_g_loss = []
+            avg_d_loss = []
+            avg_adv_loss = []
             for (melG, audioG), (melD, audioD) in loader:
                 melG = melG.cuda()      # torch.Size([16, 80, 64])
                 audioG = audioG.cuda()  # torch.Size([16, 1, 16000])
@@ -154,6 +157,9 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
                 step += 1
                 # logging
                 loss_g = loss_g.item()
+                avg_g_loss.append(loss_g)
+                avg_d_loss.append(loss_d_avg)
+                avg_adv_loss.append(adv_loss)
 
                 if any([loss_g > 1e8, math.isnan(loss_g), loss_d_avg > 1e8, math.isnan(loss_d_avg)]):
                     logger.error("loss_g %.01f loss_d_avg %.01f at step %d!" % (loss_g, loss_d_avg, step))
@@ -163,6 +169,10 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
                     writer.log_training(loss_g, loss_d_avg, adv_loss, step)
                     loader.set_description("g %.04f d %.04f ad %.04f| step %d" % (loss_g, loss_d_avg, adv_loss, step))
 
+            loader.set_description("Avg : g %.04f d %.04f ad %.04f| step %d" % (sum(avg_g_loss) / len(avg_g_loss),
+                                                                                sum(avg_d_loss) / len(avg_d_loss),
+                                                                                sum(avg_adv_loss) / len(avg_adv_loss),
+                                                                                step))
             if epoch % hp.log.save_interval == 0:
                 save_path = os.path.join(pt_dir, '%s_%s_%04d.pt'
                     % (args.name, githash, epoch))
