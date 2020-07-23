@@ -16,11 +16,11 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
     model_g = Generator(hp.audio.n_mel_channels, hp.model.n_residual_layers,
                         ratios=hp.model.generator_ratio, mult = hp.model.mult,
                         out_band = hp.model.out_channels).cuda()
-    #print("Generator : \n",model_g)
+    print("Generator : \n",model_g)
 
     model_d = MultiScaleDiscriminator(hp.model.num_D, hp.model.ndf, hp.model.n_layers,
                                       hp.model.downsampling_factor, hp.model.disc_out).cuda()
-    #print("Discriminator : \n", model_d)
+    print("Discriminator : \n", model_d)
     optim_g = torch.optim.Adam(model_g.parameters(),
         lr=hp.train.adam.lr, betas=(hp.train.adam.beta1, hp.train.adam.beta2))
     optim_d = torch.optim.Adam(model_d.parameters(),
@@ -91,7 +91,7 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
                     fake_audio = pqmf.synthesis(y_mb_)
 
 
-                sc_loss, mag_loss = stft_loss(fake_audio.squeeze(1), audioG.squeeze(1))
+                sc_loss, mag_loss = stft_loss(fake_audio[:, :, :audioG.size(2)].squeeze(1), audioG.squeeze(1))
                 loss_g = sc_loss + mag_loss
 
                 if hp.model.use_subband_stft_loss:

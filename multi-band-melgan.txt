@@ -1,0 +1,221 @@
+Generator :
+ Generator(
+  (generator): Sequential(
+    (0): ReflectionPad1d((3, 3))
+    (1): Conv1d(80, 384, kernel_size=(7,), stride=(1,))
+    (2): LeakyReLU(negative_slope=0.2)
+    (3): ConvTranspose1d(384, 192, kernel_size=(16,), stride=(8,), padding=(4,))
+    (4): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((1, 1))
+        (2): Conv1d(192, 192, kernel_size=(3,), stride=(1,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+    )
+    (5): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((3, 3))
+        (2): Conv1d(192, 192, kernel_size=(3,), stride=(1,), dilation=(3,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+    )
+    (6): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((9, 9))
+        (2): Conv1d(192, 192, kernel_size=(3,), stride=(1,), dilation=(9,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+    )
+    (7): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((27, 27))
+        (2): Conv1d(192, 192, kernel_size=(3,), stride=(1,), dilation=(27,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(192, 192, kernel_size=(1,), stride=(1,))
+    )
+    (8): LeakyReLU(negative_slope=0.2)
+    (9): ConvTranspose1d(192, 96, kernel_size=(8,), stride=(4,), padding=(2,))
+    (10): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((1, 1))
+        (2): Conv1d(96, 96, kernel_size=(3,), stride=(1,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(96, 96, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(96, 96, kernel_size=(1,), stride=(1,))
+    )
+    (11): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((3, 3))
+        (2): Conv1d(96, 96, kernel_size=(3,), stride=(1,), dilation=(3,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(96, 96, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(96, 96, kernel_size=(1,), stride=(1,))
+    )
+    (12): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((9, 9))
+        (2): Conv1d(96, 96, kernel_size=(3,), stride=(1,), dilation=(9,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(96, 96, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(96, 96, kernel_size=(1,), stride=(1,))
+    )
+    (13): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((27, 27))
+        (2): Conv1d(96, 96, kernel_size=(3,), stride=(1,), dilation=(27,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(96, 96, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(96, 96, kernel_size=(1,), stride=(1,))
+    )
+    (14): LeakyReLU(negative_slope=0.2)
+    (15): ConvTranspose1d(96, 48, kernel_size=(4,), stride=(2,), padding=(1,))
+    (16): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((1, 1))
+        (2): Conv1d(48, 48, kernel_size=(3,), stride=(1,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(48, 48, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(48, 48, kernel_size=(1,), stride=(1,))
+    )
+    (17): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((3, 3))
+        (2): Conv1d(48, 48, kernel_size=(3,), stride=(1,), dilation=(3,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(48, 48, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(48, 48, kernel_size=(1,), stride=(1,))
+    )
+    (18): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((9, 9))
+        (2): Conv1d(48, 48, kernel_size=(3,), stride=(1,), dilation=(9,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(48, 48, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(48, 48, kernel_size=(1,), stride=(1,))
+    )
+    (19): ResStack(
+      (block): Sequential(
+        (0): LeakyReLU(negative_slope=0.2)
+        (1): ReflectionPad1d((27, 27))
+        (2): Conv1d(48, 48, kernel_size=(3,), stride=(1,), dilation=(27,))
+        (3): LeakyReLU(negative_slope=0.2)
+        (4): Conv1d(48, 48, kernel_size=(1,), stride=(1,))
+      )
+      (shortcut): Conv1d(48, 48, kernel_size=(1,), stride=(1,))
+    )
+    (20): LeakyReLU(negative_slope=0.2)
+    (21): ReflectionPad1d((3, 3))
+    (22): Conv1d(48, 4, kernel_size=(7,), stride=(1,))
+    (23): Tanh()
+  )
+)
+Discriminator :
+ MultiScaleDiscriminator(
+  (model): ModuleDict(
+    (disc_0): Discriminator(
+      (discriminator): ModuleDict(
+        (layer_0): Sequential(
+          (0): ReflectionPad1d((7, 7))
+          (1): Conv1d(1, 16, kernel_size=(15,), stride=(1,))
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_1): Sequential(
+          (0): Conv1d(16, 64, kernel_size=(41,), stride=(4,), padding=(20,), groups=4)
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_2): Sequential(
+          (0): Conv1d(64, 256, kernel_size=(41,), stride=(4,), padding=(20,), groups=16)
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_3): Sequential(
+          (0): Conv1d(256, 512, kernel_size=(41,), stride=(4,), padding=(20,), groups=64)
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_4): Sequential(
+          (0): Conv1d(512, 512, kernel_size=(5,), stride=(1,), padding=(2,))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_5): Conv1d(512, 1, kernel_size=(3,), stride=(1,), padding=(1,))
+      )
+    )
+    (disc_1): Discriminator(
+      (discriminator): ModuleDict(
+        (layer_0): Sequential(
+          (0): ReflectionPad1d((7, 7))
+          (1): Conv1d(1, 16, kernel_size=(15,), stride=(1,))
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_1): Sequential(
+          (0): Conv1d(16, 64, kernel_size=(41,), stride=(4,), padding=(20,), groups=4)
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_2): Sequential(
+          (0): Conv1d(64, 256, kernel_size=(41,), stride=(4,), padding=(20,), groups=16)
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_3): Sequential(
+          (0): Conv1d(256, 512, kernel_size=(41,), stride=(4,), padding=(20,), groups=64)
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_4): Sequential(
+          (0): Conv1d(512, 512, kernel_size=(5,), stride=(1,), padding=(2,))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_5): Conv1d(512, 1, kernel_size=(3,), stride=(1,), padding=(1,))
+      )
+    )
+    (disc_2): Discriminator(
+      (discriminator): ModuleDict(
+        (layer_0): Sequential(
+          (0): ReflectionPad1d((7, 7))
+          (1): Conv1d(1, 16, kernel_size=(15,), stride=(1,))
+          (2): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_1): Sequential(
+          (0): Conv1d(16, 64, kernel_size=(41,), stride=(4,), padding=(20,), groups=4)
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_2): Sequential(
+          (0): Conv1d(64, 256, kernel_size=(41,), stride=(4,), padding=(20,), groups=16)
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_3): Sequential(
+          (0): Conv1d(256, 512, kernel_size=(41,), stride=(4,), padding=(20,), groups=64)
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_4): Sequential(
+          (0): Conv1d(512, 512, kernel_size=(5,), stride=(1,), padding=(2,))
+          (1): LeakyReLU(negative_slope=0.2, inplace=True)
+        )
+        (layer_5): Conv1d(512, 1, kernel_size=(3,), stride=(1,), padding=(1,))
+      )
+    )
+  )
+  (downsample): AvgPool1d(kernel_size=(4,), stride=(2,), padding=(1,))
+)

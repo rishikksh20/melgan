@@ -30,11 +30,18 @@ def main(args):
         if len(mel.shape) == 2:
             mel = mel.unsqueeze(0)
         mel = mel.cuda()
-        if hp.model.out_channels == 1:
-            audio = model.inference(mel).cpu().detach().numpy()
-        else:
+        audio = model.inference(mel)
+        # For multi-band inference
+        if hp.model.out_channels > 1:
             pqmf = PQMF()
-            audio = pqmf.synthesis(model.inference(mel)).view(-1).cpu().detach().numpy()
+            audio = pqmf.synthesis(audio).view(-1)
+        
+        audio = audio.squeeze() # collapse all dimension except time axis
+        audio = audio[:-(hp.audio.hop_length*10)]
+        audio = MAX_WAV_VALUE * audio
+        audio = audio.clamp(min=-MAX_WAV_VALUE, max=MAX_WAV_VALUE-1)
+        audio = audio.short()
+        audio = audio.cpu().detach().numpy()
 
         out_path = args.input.replace('.npy', '_reconstructed_epoch%04d.wav' % checkpoint['epoch'])
         write(out_path, hp.audio.sampling_rate, audio)

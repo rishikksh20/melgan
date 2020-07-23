@@ -16,6 +16,9 @@ def validate(hp, args, generator, discriminator, valloader, stft_loss, criterion
 
         # generator
         fake_audio = generator(mel) # B, 1, T' torch.Size([1, 1, 212992])
+        if hp.model.out_channels > 1:
+            y_mb_ = fake_audio
+            fake_audio = pqmf.synthesis(fake_audio)
         disc_fake = discriminator(fake_audio[:, :, :audio.size(2)]) # B, 1, T torch.Size([1, 1, 212893])
         disc_real = discriminator(audio)
 
@@ -24,6 +27,15 @@ def validate(hp, args, generator, discriminator, valloader, stft_loss, criterion
         loss_d_fake = 0.0
         sc_loss, mag_loss = stft_loss(fake_audio[:, :, :audio.size(2)].squeeze(1), audio.squeeze(1))
         loss_g = sc_loss + mag_loss
+
+        if hp.model.use_subband_stft_loss:
+            loss_g *= 0.5  # for balancing with subband stft loss
+            y_mb = pqmf.analysis(audio)
+            y_mb = y_mb.view(-1, y_mb.size(2))  # (B, C, T) -> (B x C, T)
+            y_mb_ = y_mb_.view(-1, y_mb_.size(2))  # (B, C, T) -> (B x C, T)
+            sub_sc_loss, sub_mag_loss = stft_loss(y_mb_, y_mb)
+            loss_g += 0.5 * (sub_sc_loss + sub_mag_loss)
+
         for (feats_fake, score_fake), (feats_real, score_real) in zip(disc_fake, disc_real):
             adv_loss += criterion(score_fake, torch.ones_like(score_fake))
 
