@@ -37,7 +37,8 @@ Check out [here](https://drive.google.com/drive/folders/12XX1QB9LzzMC4pdC_k8EWdv
 - `python inference.py -p [checkpoint path] -i [input mel path]`
 
 ## Results
-WIP
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rishikksh20/melgan/blob/master/melgan_infer.ipynb) <br />
+
 
 ## References
 - [Multi-band MelGAN](https://arxiv.org/abs/2005.05106)
