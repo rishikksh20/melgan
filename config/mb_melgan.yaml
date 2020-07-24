@@ -28,7 +28,7 @@ audio:
 model:
   feat_match: 10.0
   lambda_adv: 2.5
-  use_subband_stft_loss: False
+  use_subband_stft_loss: True
   feat_loss: False
   out_channels: 4
   generator_ratio:  [8, 4, 2] # for 256 hop size and 22050 sample rate
@@ -39,6 +39,17 @@ model:
   n_layers: 3
   downsampling_factor: 4
   disc_out: 512
+
+stft_loss_params:
+    fft_sizes: [1024, 2048, 512]  # List of FFT size for STFT-based loss.
+    hop_sizes: [120, 240, 50]     # List of hop size for STFT-based loss
+    win_lengths: [600, 1200, 240] # List of window length for STFT-based loss.
+    window: "hann_window"         # Window function for STFT-based loss
+subband_stft_loss_params:
+  fft_sizes: [384, 683, 171]  # List of FFT size for STFT-based loss.
+  hop_sizes: [30, 60, 10]     # List of hop size for STFT-based loss
+  win_lengths: [150, 300, 60] # List of window length for STFT-based loss.
+  window: "hann_window"       # Window function for STFT-based loss
 ---
 log:
   summary_interval: 1

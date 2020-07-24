@@ -61,6 +61,10 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
         model_d.train()
         stft_loss = MultiResolutionSTFTLoss()
         criterion = torch.nn.MSELoss().cuda()
+        sub_stft_loss = MultiResolutionSTFTLoss(hp.subband_stft_loss_params.fft_sizes,
+                                                hp.subband_stft_loss_params.hop_sizes,
+                                                hp.subband_stft_loss_params.win_lengths)
+        
         pqmf = PQMF()
 
         for epoch in itertools.count(init_epoch+1):
@@ -103,7 +107,7 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
                     y_mb = pqmf.analysis(audioG)
                     y_mb = y_mb.view(-1, y_mb.size(2))  # (B, C, T) -> (B x C, T)
                     y_mb_ = y_mb_.view(-1, y_mb_.size(2))  # (B, C, T) -> (B x C, T)
-                    sub_sc_loss, sub_mag_loss = stft_loss(y_mb_, y_mb)
+                    sub_sc_loss, sub_mag_loss = sub_stft_loss(y_mb_[:, :y_mb.size(-1)], y_mb)  # y_mb --> [B*C, T]
                     loss_g += 0.5 * (sub_sc_loss + sub_mag_loss)
                 adv_loss = 0.0
                 if step > hp.train.discriminator_train_start_steps:
@@ -133,6 +137,8 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
                 loss_d_avg = 0.0
                 if step > hp.train.discriminator_train_start_steps:
                     fake_audio = model_g(melD)[:, :, :hp.audio.segment_length]
+                    if hp.model.out_channels > 1:
+                        fake_audio = pqmf.synthesis(fake_audio)
                     fake_audio = fake_audio.detach()
                     loss_d_sum = 0.0
                     for _ in range(hp.train.rep_discriminator):
@@ -167,9 +173,7 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
 
                 if step % hp.log.summary_interval == 0:
                     writer.log_training(loss_g, loss_d_avg, adv_loss, step)
-                    loader.set_description("g %.04f d %.04f ad %.04f| step %d" % (loss_g, loss_d_avg, adv_loss, step))
-
-            loader.set_description("Avg : g %.04f d %.04f ad %.04f| step %d" % (sum(avg_g_loss) / len(avg_g_loss),
+                    loader.set_description("Avg : g %.04f d %.04f ad %.04f| step %d" % (sum(avg_g_loss) / len(avg_g_loss),
                                                                                 sum(avg_d_loss) / len(avg_d_loss),
                                                                                 sum(avg_adv_loss) / len(avg_adv_loss),
                                                                                 step))
