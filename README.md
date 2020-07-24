@@ -30,7 +30,7 @@ pip install -r requirements.txt
 - `tensorboard --logdir logs/`
 
 ## Pretrained model
-Check it [here](https://drive.google.com/drive/folders/12XX1QB9LzzMC4pdC_k8EWdvfKDhoEOa9?usp=sharing).
+Check out [here](https://drive.google.com/drive/folders/12XX1QB9LzzMC4pdC_k8EWdvfKDhoEOa9?usp=sharing).
 
 ## Inference
 
