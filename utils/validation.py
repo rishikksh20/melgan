@@ -2,7 +2,7 @@ import tqdm
 import torch
 
 
-def validate(hp, args, generator, discriminator, valloader, stft_loss, criterion, pqmf, writer, step):
+def validate(hp, args, generator, discriminator, valloader, stft_loss, sub_stft_loss, criterion, pqmf, writer, step):
     generator.eval()
     discriminator.eval()
     torch.backends.cudnn.benchmark = False
@@ -33,7 +33,7 @@ def validate(hp, args, generator, discriminator, valloader, stft_loss, criterion
             y_mb = pqmf.analysis(audio)
             y_mb = y_mb.view(-1, y_mb.size(2))  # (B, C, T) -> (B x C, T)
             y_mb_ = y_mb_.view(-1, y_mb_.size(2))  # (B, C, T) -> (B x C, T)
-            sub_sc_loss, sub_mag_loss = stft_loss(y_mb_, y_mb)
+            sub_sc_loss, sub_mag_loss = sub_stft_loss(y_mb_[:, :y_mb.size(-1)], y_mb)
             loss_g += 0.5 * (sub_sc_loss + sub_mag_loss)
 
         for (feats_fake, score_fake), (feats_real, score_real) in zip(disc_fake, disc_real):

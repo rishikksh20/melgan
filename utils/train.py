@@ -70,7 +70,7 @@ def train(args, pt_dir, chkpt_path, trainloader, valloader, writer, logger, hp, 
         for epoch in itertools.count(init_epoch+1):
             if epoch % hp.log.validation_interval == 0:
                 with torch.no_grad():
-                    validate(hp, args, model_g, model_d, valloader, stft_loss, criterion, pqmf,  writer, step)
+                    validate(hp, args, model_g, model_d, valloader, stft_loss, sub_stft_loss, criterion, pqmf, writer, step)
 
             trainloader.dataset.shuffle_mapping()
             loader = tqdm.tqdm(trainloader, desc='Loading train data')
