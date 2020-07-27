@@ -1,12 +1,12 @@
 data: # root path of train/validation data (either relative/absoulte path is ok)
-  train: 'LJSpeech-1.1\wavs'
-  validation: 'LJSpeech-1.1\valid'
-  mel_path: 'data\mels'
+  train: '/workspace/LJSpeech-1.1/wavs'
+  validation: '/workspace/LJSpeech-1.1/valid'
+  mel_path: '/workspace/FastSpeech2/data/mels'
 ---
 train:
   rep_discriminator: 1
   discriminator_train_start_steps: 200000
-  num_workers: 4
+  num_workers: 8
   batch_size: 16
   optimizer: 'adam'
   adam:
@@ -27,7 +27,7 @@ audio:
 ---
 model:
   feat_match: 10.0
-  lambda_adv: 4
+  lambda_adv: 2.5
   use_subband_stft_loss: False
   feat_loss: False
   out_channels: 1
@@ -39,10 +39,21 @@ model:
   n_layers: 3
   downsampling_factor: 4
   disc_out: 512
+  
+stft_loss_params:
+    fft_sizes: [1024, 2048, 512]  # List of FFT size for STFT-based loss.
+    hop_sizes: [120, 240, 50]     # List of hop size for STFT-based loss
+    win_lengths: [600, 1200, 240] # List of window length for STFT-based loss.
+    window: "hann_window"         # Window function for STFT-based loss
+subband_stft_loss_params:
+  fft_sizes: [384, 683, 171]  # List of FFT size for STFT-based loss.
+  hop_sizes: [30, 60, 10]     # List of hop size for STFT-based loss
+  win_lengths: [150, 300, 60] # List of window length for STFT-based loss.
+  window: "hann_window"       # Window function for STFT-based loss
 ---
 log:
   summary_interval: 1
   validation_interval: 5
-  save_interval: 25
+  save_interval: 20
   chkpt_dir: 'chkpt'
   log_dir: 'logs'
