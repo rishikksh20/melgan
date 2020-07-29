@@ -31,7 +31,7 @@ model:
   use_subband_stft_loss: True
   feat_loss: False
   out_channels: 4
-  generator_ratio:  [8, 4, 2] # for 256 hop size and 22050 sample rate
+  generator_ratio:  [8, 4, 2] # for 256/4 hop size and 22050 sample rate
   mult: 192
   n_residual_layers: 4
   num_D : 3

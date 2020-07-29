@@ -8,6 +8,7 @@ import numpy as np
 from model.generator import Generator
 from utils.hparams import HParam, load_hparam_str
 from utils.pqmf import PQMF
+from denoiser import Denoiser
 
 MAX_WAV_VALUE = 32768.0
 
@@ -23,7 +24,7 @@ def main(args):
                         ratios=hp.model.generator_ratio, mult = hp.model.mult,
                         out_band = hp.model.out_channels).cuda()
     model.load_state_dict(checkpoint['model_g'])
-    model.eval(inference=False)
+    model.eval(inference=True)
 
     with torch.no_grad():
         mel = torch.from_numpy(np.load(args.input))
@@ -35,8 +36,11 @@ def main(args):
         if hp.model.out_channels > 1:
             pqmf = PQMF()
             audio = pqmf.synthesis(audio).view(-1)
-        
-        audio = audio.squeeze() # collapse all dimension except time axis
+        audio = audio.squeeze(0)  # collapse all dimension except time axis
+        if args.d:
+            denoiser = Denoiser(model).cuda()
+            audio = denoiser(audio, 0.1)
+        audio = audio.squeeze()
         audio = audio[:-(hp.audio.hop_length*10)]
         audio = MAX_WAV_VALUE * audio
         audio = audio.clamp(min=-MAX_WAV_VALUE, max=MAX_WAV_VALUE-1)
@@ -55,6 +59,7 @@ if __name__ == '__main__':
                         help="path of checkpoint pt file for evaluation")
     parser.add_argument('-i', '--input', type=str, required=True,
                         help="directory of mel-spectrograms to invert into raw audio. ")
+    parser.add_argument('-d', action='store_true', help="denoising ")
     args = parser.parse_args()
 
     main(args)

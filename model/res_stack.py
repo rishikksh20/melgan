@@ -22,3 +22,15 @@ class ResStack(nn.Module):
 
     def forward(self, x):
         return self.shortcut(x) + self.block(x)
+
+    def remove_weight_norm(self):
+        nn.utils.remove_weight_norm(self.block[2])
+        nn.utils.remove_weight_norm(self.block[4])
+        nn.utils.remove_weight_norm(self.shortcut)
+        # def _remove_weight_norm(m):
+        #     try:
+        #         torch.nn.utils.remove_weight_norm(m)
+        #     except ValueError:  # this module didn't have weight norm
+        #         return
+        #
+        # self.apply(_remove_weight_norm)
